@@ -1,0 +1,56 @@
+{% extends "books/add_book_base.html" %}
+
+{% block step_content %}
+<div class="row">
+    <div class="col-md-8">
+        <p class="text-muted">Point us to your book on Amazon, and tell us the genre you're in.</p>
+        
+        <div class="mb-3">
+            <label for="amazon_url" class="form-label">Provide the full URL to your book on Amazon *</label>
+            <input type="url" class="form-control" id="amazon_url" name="amazon_url" 
+                   value="{{ book_data.amazon_url|default:'' }}" required>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="language" class="form-label">Book language</label>
+                <select class="form-select" id="language" name="language">
+                    <option value="English" {% if book_data.language == 'English' %}selected{% endif %}>English</option>
+                    <option value="Deutsch" {% if book_data.language == 'Deutsch' %}selected{% endif %}>Deutsch</option>
+                    <option value="French" {% if book_data.language == 'French' %}selected{% endif %}>French</option>
+                    <option value="Italian" {% if book_data.language == 'Italian' %}selected{% endif %}>Italian</option>
+                    <option value="Spanish" {% if book_data.language == 'Spanish' %}selected{% endif %}>Spanish</option>
+                    <option value="Other" {% if book_data.language == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label for="marketplace" class="form-label">Preferred marketplace for receiving reviews</label>
+                <select class="form-select" id="marketplace" name="marketplace">
+                    <option value="USA" {% if book_data.marketplace == 'USA' %}selected{% endif %}>USA</option>
+                    <option value="UK" {% if book_data.marketplace == 'UK' %}selected{% endif %}>UK</option>
+                    <option value="Germany" {% if book_data.marketplace == 'Germany' %}selected{% endif %}>Germany</option>
+                    <option value="France" {% if book_data.marketplace == 'France' %}selected{% endif %}>France</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="goodreads_link" class="form-label">Goodreads link (Optional)</label>
+            <input type="url" class="form-control" id="goodreads_link" name="goodreads_link" 
+                   value="{{ book_data.goodreads_link|default:'' }}">
+        </div>
+        
+        <div class="mb-3">
+            <label for="genre" class="form-label">Select the genre of your book</label>
+            <select class="form-select" id="genre" name="genre">
+                <option value="Children's Book" {% if book_data.genre == "Children's Book" %}selected{% endif %}>Children's Book | Low Content</option>
+                <option value="Cook Books" {% if book_data.genre == "Cook Books" %}selected{% endif %}>Cook Books | Low Content</option>
+                <option value="Self Help" {% if book_data.genre == "Self Help" %}selected{% endif %}>Self Help | Non-fiction</option>
+                <option value="Business" {% if book_data.genre == "Business" %}selected{% endif %}>Business and Money | Non-fiction</option>
+                <option value="Other" {% if book_data.genre == "Other" %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "books/add_book_base.html" %}
+
+{% block step_content %}
+<div class="row">
+    <div class="col-md-8">
+        <p class="text-muted">Submit last information</p>
+        
+        <div class="mb-3">
+            <label for="word_count" class="form-label">Word count</label>
+            <input type="number" class="form-control" id="word_count" name="word_count" 
+                   value="{{ book_data.word_count|default:'' }}">
+        </div>
+        
+        <div class="mb-3">
+            <label for="summary" class="form-label">Summary of your Book</label>
+            <textarea class="form-control" id="summary" name="summary" rows="4">{{ book_data.summary|default:'' }}</textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="author_info" class="form-label">Information About Author</label>
+            <textarea class="form-control" id="author_info" name="author_info" rows="4">{{ book_data.author_info|default:'' }}</textarea>
+        </div>
+        
+        <div class="alert alert-info">
+            <h5>Review your information:</h5>
+            <ul>
+                <li><strong>Title:</strong> {{ book_data.title }}</li>
+                <li><strong>Author:</strong> {{ book_data.author }}</li>
+                <li><strong>Reading Type:</strong> {{ book_data.reading_type }}</li>
+                <li><strong>Language:</strong> {{ book_data.language }}</li>
+                <li><strong>Genre:</strong> {{ book_data.genre }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

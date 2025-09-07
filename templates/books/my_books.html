@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2>Мои книги</h2>
-<a href="{% url 'books:add_book' %}" class="btn btn-primary">Добавить книгу</a>
+<a href="{% url 'books:add_book_wizard' %}" class="btn btn-primary">Добавить книгу</a>
 
 <div class="book-list">
 {% for book in books %}

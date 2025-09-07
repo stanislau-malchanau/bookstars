@@ -1,0 +1,27 @@
+{% extends "books/add_book_base.html" %}
+
+{% block step_content %}
+<div class="row">
+    <div class="col-md-6">
+        <p class="text-muted">Complete a few steps in 3 minutes — and the book is added!</p>
+        
+        <div class="mb-3">
+            <label for="title" class="form-label">Provide the full title *</label>
+            <input type="text" class="form-control" id="title" name="title" 
+                   value="{{ book_data.title|default:'' }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="author" class="form-label">Provide the author *</label>
+            <input type="text" class="form-control" id="author" name="author" 
+                   value="{{ book_data.author|default:'' }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="asin" class="form-label">Add book ASIN code (optional)</label>
+            <input type="text" class="form-control" id="asin" name="asin" 
+                   value="{{ book_data.asin|default:'' }}">
+        </div>
+    </div>
+</div>
+{% endblock %}
