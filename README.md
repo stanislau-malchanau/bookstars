@@ -24,6 +24,7 @@ SaaS platform that helps authors generate real, high-quality reviews for their l
 3.  Установите зависимости:
     ```bash
     pip install -r requirements.txt
+    pip install Pillow
 
 4.  Примените миграции:
     ```bash

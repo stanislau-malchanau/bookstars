@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
 from django.views.generic import ListView
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -10,7 +11,9 @@ from users.decorators import role_required
 from users.mixins import RoleRequiredMixin
 
 from .models import Book
-from .forms import BookForm, BookCoverForm, BookFileForm
+from .forms import BookForm, BookCoverForm, BookFileForm, GetReviewedForm
+
+from economy.models import StarBalance
 
 import json
 import os
@@ -192,3 +195,68 @@ class AdminBookListView(RoleRequiredMixin, ListView):
     model = Book
     template_name = 'books/admin_book_list.html'
     context_object_name = 'books'
+
+@login_required
+def get_reviewed(request, book_id):
+    """Запрос обзоров на книгу"""
+    book = get_object_or_404(Book, pk=book_id, owner=request.user)
+    
+    # Проверяем, что книга в статусе "live"
+    if not book.is_live:
+        messages.error(request, 'Книгу можно отправить на обзор только в статусе "Live"')
+        return redirect('books:view_book', book_id=book.id)
+    
+    if request.method == 'POST':
+        form = GetReviewedForm(request.POST)
+        if form.is_valid():
+            # Получаем данные из формы
+            reading_type = form.cleaned_data['reading_type']
+            book_price = form.cleaned_data.get('book_price')
+            print_book_link = form.cleaned_data.get('print_book_link')
+            print_book_price = form.cleaned_data.get('print_book_price')
+            add_goodreads = form.cleaned_data.get('add_goodreads_review')
+            goodreads_link = form.cleaned_data.get('goodreads_link')
+            add_photo = form.cleaned_data.get('add_photo_review')
+            add_video = form.cleaned_data.get('add_video_review')
+            
+            # Рассчитываем стоимость
+            stars_cost = book.get_stars_cost()
+            
+            # Проверяем баланс звезд
+            try:
+                star_balance = request.user.star_balance
+            except StarBalance.DoesNotExist:
+                star_balance = StarBalance.objects.create(user=request.user)
+            
+            if star_balance.balance < stars_cost:
+                messages.error(request, f'Недостаточно звезд. Требуется {stars_cost}, у вас {star_balance.balance}')
+                return redirect('books:get_reviewed', book_id=book.id)
+            
+            # Списываем звезды
+            if star_balance.spend_stars(stars_cost, f"Get reviewed for book '{book.title}'"):
+                # Обновляем книгу
+                book.reading_type = reading_type
+                book.book_price = book_price
+                book.print_book_link = print_book_link
+                book.print_book_price = print_book_price
+                book.add_goodreads_review = add_goodreads
+                book.goodreads_link = goodreads_link
+                book.add_photo_review = add_photo
+                book.add_video_review = add_video
+                book.stars_cost = stars_cost
+                book.review_requested_at = timezone.now()
+                book.save()
+                
+                messages.success(request, f'Запрос на обзор отправлен! Списано {stars_cost} звезд.')
+                return redirect('books:my_books')
+            else:
+                messages.error(request, 'Ошибка при списании звезд')
+                return redirect('books:get_reviewed', book_id=book.id)
+    else:
+        form = GetReviewedForm()
+    
+    return render(request, 'books/get_reviewed.html', {
+        'book': book,
+        'form': form,
+        'stars_cost': book.get_stars_cost()
+    })

@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Get Reviewed</h2>
+    
+    <!-- Book Card -->
+    <div class="card mb-4">
+        <div class="row g-0">
+            {% if book.cover_image %}
+            <div class="col-md-2">
+                <img src="{{ book.cover_image.url }}" class="img-fluid rounded-start" alt="{{ book.title }}">
+            </div>
+            {% endif %}
+            <div class="col-md">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Статус: 
+                            {% if book.status == 'live' %}
+                                <span class="badge bg-success">Live</span>
+                            {% elif book.status == 'draft' %}
+                                <span class="badge bg-secondary">Draft</span>
+                            {% elif book.status == 'moderation' %}
+                                <span class="badge bg-warning">Moderation</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ book.get_status_display }}</span>
+                            {% endif %}
+                        </small>
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Язык: {{ book.language }} | 
+                            Рынок: {{ book.preferred_marketplace|default:"Не указан" }}
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-info">
+        <strong>Примечание:</strong> Ваш читатель прочитает и оставит отзыв на вашу книгу в течение 5 дней.
+    </div>
+    
+    <h3>ВЫБЕРИТЕ ВАРИАНТЫ ОБЗОРА</h3>
+    <p class="text-muted">Выберите один из вариантов ниже</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <!-- Reading Type Selection -->
+        <div class="mb-4">
+            <div class="row">
+                {% for radio in form.reading_type %}
+                <div class="col-md-6 mb-3">
+                    <div class="border rounded p-3 h-100">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" 
+                                   name="{{ form.reading_type.name }}" 
+                                   id="{{ radio.id_for_label }}"
+                                   value="{{ radio.choice_value }}"
+                                   {% if radio.choice_value == form.reading_type.value %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                <h5>{{ radio.choice_label }}</h5>
+                                <p class="text-muted small">
+                                    {% if radio.choice_value == 'standard' %}
+                                        Ваш читатель скачает и прочитает вашу книгу, затем оставит отзыв на Amazon
+                                    {% elif radio.choice_value == 'kindle_unlimited' %}
+                                        Ваш читатель прочитает и оставит отзыв на вашу книгу, используя Kindle Unlimited
+                                    {% elif radio.choice_value == 'verified_ebook' %}
+                                        Ваш читатель купит книгу и оставит отзыв Verified Purchase
+                                    {% elif radio.choice_value == 'verified_print' %}
+                                        Ваш читатель купит книгу и оставит отзыв Verified Purchase с фото/видео
+                                    {% endif %}
+                                </p>
+                                
+                                <!-- Additional fields based on reading type -->
+                                {% if radio.choice_value == 'verified_ebook' %}
+                                    <div class="mt-2" id="verified_ebook_fields" 
+                                         style="{% if form.reading_type.value != 'verified_ebook' %}display:none;{% endif %}">
+                                        <div class="mb-2">
+                                            <label for="{{ form.book_price.id_for_label }}" class="form-label">
+                                                Цена вашей книги на Amazon, USD *
+                                            </label>
+                                            {{ form.book_price }}
+                                            {% if form.book_price.errors %}
+                                                <div class="text-danger">{{ form.book_price.errors }}</div>
+                                            {% endif %}
+                                            <small class="text-muted">Если ваша книга на бесплатной промоакции, просто напишите "0"</small>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Стоимость: 200 звезд</strong>
+                                        </div>
+                                    </div>
+                                {% elif radio.choice_value == 'verified_print' %}
+                                    <div class="mt-2" id="verified_print_fields" 
+                                         style="{% if form.reading_type.value != 'verified_print' %}display:none;{% endif %}">
+                                        <div class="mb-2">
+                                            <label for="{{ form.print_book_link.id_for_label }}" class="form-label">
+                                                Ссылка на печатную книгу *
+                                            </label>
+                                            {{ form.print_book_link }}
+                                            {% if form.print_book_link.errors %}
+                                                <div class="text-danger">{{ form.print_book_link.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="{{ form.print_book_price.id_for_label }}" class="form-label">
+                                                Цена вашей печатной книги на Amazon, USD *
+                                            </label>
+                                            {{ form.print_book_price }}
+                                            {% if form.print_book_price.errors %}
+                                                <div class="text-danger">{{ form.print_book_price.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Стоимость: 250 звезд</strong>
+                                        </div>
+                                        
+                                        <!-- Photo/Video options -->
+                                        <div class="form-check mt-2">
+                                            {{ form.add_photo_review }}
+                                            <label class="form-check-label" for="{{ form.add_photo_review.id_for_label }}">
+                                                Добавить фото в отзыв (+50 звезд)
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            {{ form.add_video_review }}
+                                            <label class="form-check-label" for="{{ form.add_video_review.id_for_label }}">
+                                                Добавить видео в отзыв (+100 звезд)
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% elif radio.choice_value == 'standard' %}
+                                    <div class="mt-2">
+                                        <strong>Стоимость: 100 звезд</strong>
+                                    </div>
+                                {% elif radio.choice_value == 'kindle_unlimited' %}
+                                    <div class="mt-2">
+                                        <strong>Стоимость: 150 звезд</strong>
+                                    </div>
+                                {% endif %}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Goodreads Option -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="form-check mb-2">
+                    {{ form.add_goodreads_review }}
+                    <label class="form-check-label" for="{{ form.add_goodreads_review.id_for_label }}">
+                        Добавить отзыв на Goodreads (+50 звезд)
+                    </label>
+                </div>
+                <div id="goodreads_fields" style="{% if not form.add_goodreads_review.value %}display:none;{% endif %}">
+                    <label for="{{ form.goodreads_link.id_for_label }}" class="form-label">
+                        Введите ссылку на вашу книгу на Goodreads
+                    </label>
+                    {{ form.goodreads_link }}
+                    {% if form.goodreads_link.errors %}
+                        <div class="text-danger">{{ form.goodreads_link.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Summary and Cost -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4>Итого к оплате: <span id="total_stars">{{ book.get_stars_cost }}</span> звезд</h4>
+                <p class="text-muted">Ваш текущий баланс: {{ user.star_balance.balance|default:0 }} звезд</p>
+                
+                {% if user.star_balance.balance|default:0 < book.get_stars_cost %}
+                    <div class="alert alert-warning">
+                        Недостаточно звезд для запроса обзора. Требуется {{ book.get_stars_cost }} звезд.
+                    </div>
+                    <button type="submit" class="btn btn-primary" disabled>Получить обзоры</button>
+                {% else %}
+                    <button type="submit" class="btn btn-primary">Получить обзоры</button>
+                {% endif %}
+                
+                <a href="{% url 'books:view_book' book.id %}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Показ/скрытие дополнительных полей в зависимости от выбранного типа чтения
+document.addEventListener('DOMContentLoaded', function() {
+    const readingTypeRadios = document.querySelectorAll('input[name="reading_type"]');
+    const verifiedEbookFields = document.getElementById('verified_ebook_fields');
+    const verifiedPrintFields = document.getElementById('verified_print_fields');
+    const goodreadsFields = document.getElementById('goodreads_fields');
+    const addGoodreadsCheckbox = document.getElementById('{{ form.add_goodreads_review.id_for_label }}');
+    const totalStarsElement = document.getElementById('total_stars');
+    
+    function updateFields() {
+        const selectedType = document.querySelector('input[name="reading_type"]:checked').value;
+        
+        // Скрываем все поля
+        if (verifiedEbookFields) verifiedEbookFields.style.display = 'none';
+        if (verifiedPrintFields) verifiedPrintFields.style.display = 'none';
+        
+        // Показываем нужные поля
+        if (selectedType === 'verified_ebook' && verifiedEbookFields) {
+            verifiedEbookFields.style.display = 'block';
+        } else if (selectedType === 'verified_print' && verifiedPrintFields) {
+            verifiedPrintFields.style.display = 'block';
+        }
+        
+        // Обновляем стоимость
+        let baseCost = 100;
+        if (selectedType === 'standard') baseCost = 100;
+        else if (selectedType === 'kindle_unlimited') baseCost = 150;
+        else if (selectedType === 'verified_ebook') baseCost = 200;
+        else if (selectedType === 'verified_print') baseCost = 250;
+        
+        // Добавляем стоимость дополнительных опций
+        let totalCost = baseCost;
+        if (addGoodreadsCheckbox && addGoodreadsCheckbox.checked) totalCost += 50;
+        if (document.getElementById('{{ form.add_photo_review.id_for_label }}')?.checked) totalCost += 50;
+        if (document.getElementById('{{ form.add_video_review.id_for_label }}')?.checked) totalCost += 100;
+        
+        totalStarsElement.textContent = totalCost;
+    }
+    
+    // Добавляем обработчики событий
+    readingTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateFields);
+    });
+    
+    if (addGoodreadsCheckbox) {
+        addGoodreadsCheckbox.addEventListener('change', function() {
+            goodreadsFields.style.display = this.checked ? 'block' : 'none';
+            updateFields();
+        });
+    }
+    
+    // Инициализация при загрузке страницы
+    updateFields();
+});
+</script>
+{% endblock %}
