@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Редактировать книгу: {{ book.title }}</h2>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}">Название *</label>
+            {{ form.title }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.author.id_for_label }}">Автор *</label>
+            {{ form.author }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.asin.id_for_label }}">ASIN (опционально)</label>
+            {{ form.asin }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.language.id_for_label }}">Язык</label>
+            {{ form.language }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.genre.id_for_label }}">Жанр</label>
+            {{ form.genre }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.status.id_for_label }}">Статус</label>
+            {{ form.status }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.summary.id_for_label }}">Описание</label>
+            {{ form.summary }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.word_count.id_for_label }}">Количество слов</label>
+            {{ form.word_count }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.author_info.id_for_label }}">Информация об авторе</label>
+            {{ form.author_info }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.cover_image.id_for_label }}">Обложка (загрузить новую)</label>
+            {{ form.cover_image }}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        <a href="{% url 'books:view_book' book.pk %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

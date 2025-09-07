@@ -20,6 +20,8 @@ from economy.models import StarBalance
 import json
 import os
 
+
+
 @login_required
 def my_books(request):
     # Только для авторизованных пользователей
@@ -50,6 +52,8 @@ BOOK_ADD_STEPS = {
     4: {'title': 'Point us to your book on Amazon', 'template': 'books/add_book_step4.html'},
     5: {'title': 'Submit last information', 'template': 'books/add_book_step5.html'},
 }
+
+
 
 @login_required
 def add_book_wizard(request):
@@ -182,10 +186,41 @@ def handle_step_post(request, step):
     next_step = min(step + 1, len(BOOK_ADD_STEPS))
     return redirect(f"{request.path}?step={next_step}")
 
+
+
 @login_required
 def view_book(request, book_id):
+    """Просмотр книги"""
     book = get_object_or_404(Book, pk=book_id, owner=request.user)
     return render(request, 'books/view_book.html', {'book': book})
+
+
+
+@login_required
+def edit_book(request, book_id):
+    """Редактирование книги"""
+    book = get_object_or_404(Book, pk=book_id, owner=request.user)
+    
+    if request.method == 'POST':
+        form = BookForm(request.POST, request.FILES, instance=book)
+        if form.is_valid():
+            # Сохраняем обложку только если она была загружена
+            if request.FILES.get('cover_image'):
+                book.cover_image = request.FILES['cover_image']
+            form.save()
+            messages.success(request, 'Книга успешно обновлена!')
+            return redirect('books:view_book', book_id=book.id)
+    else:
+        form = BookForm(instance=book)
+
+    context = {
+        'form': form,
+        'book': book,
+    }
+    
+    return render(request, 'books/edit_book.html', context)
+
+
 
 @role_required(['admin', 'moderator'])
 def moderate_books(request):
@@ -199,6 +234,8 @@ class AdminBookListView(RoleRequiredMixin, ListView):
     model = Book
     template_name = 'books/admin_book_list.html'
     context_object_name = 'books'
+
+
 
 @login_required
 def get_reviewed(request, book_id):
@@ -264,6 +301,8 @@ def get_reviewed(request, book_id):
         'form': form,
         'stars_cost': book.get_stars_cost()
     })
+
+
 
 @login_required
 def library(request):
@@ -331,6 +370,8 @@ def library(request):
     
     return render(request, 'books/library.html', context)
 
+
+
 @login_required
 def assign_book(request, book_id):
     """Назначить книгу пользователю для обзора"""
@@ -350,6 +391,8 @@ def assign_book(request, book_id):
     
     messages.success(request, f'Вы успешно назначены на книгу "{book.title}". Начните чтение!')
     return redirect('books:my_assigned_books')
+
+
 
 @login_required
 def my_assigned_books(request):
@@ -378,6 +421,8 @@ def my_assigned_books(request):
     }
     
     return render(request, 'books/my_assigned_books.html', context)
+
+
 
 @login_required
 def book_for_review(request, assignment_id):
@@ -410,6 +455,8 @@ def book_for_review(request, assignment_id):
         'assignment': assignment,
     })
 
+
+
 @login_required
 def cancel_assignment(request, assignment_id):
     """Отменить назначение"""
@@ -428,6 +475,8 @@ def cancel_assignment(request, assignment_id):
     return render(request, 'books/cancel_assignment.html', {
         'assignment': assignment,
     })
+
+
 
 @login_required
 def report_issue(request, assignment_id):
