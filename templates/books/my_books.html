@@ -1,6 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>My Books</h2>
-<p>This page is only visible to logged-in users.</p>
+<h2>Мои книги</h2>
+<a href="{% url 'books:add_book' %}" class="btn btn-primary">Добавить книгу</a>
+
+<div class="book-list">
+{% for book in books %}
+    <div class="book-card">
+        <h3>{{ book.title }}</h3>
+        <p>Автор: {{ book.author }}</p>
+        <p>Статус: {{ book.get_status_display }}</p>
+        <p>Язык: {{ book.language }}</p>
+        <p>Жанр: {{ book.genre }}</p>
+        <!-- Добавим кнопки действий -->
+        <a href="{% url 'books:view_book' book.pk %}">Просмотр</a>
+        {% if book.status == 'draft' or book.status == 'rejected' %}
+            <a href="{% url 'books:edit_book' book.pk %}">Редактировать</a>
+        {% endif %}
+        {% if book.status == 'live' %}
+            <a href="{% url 'books:get_reviewed' book.pk %}">Получить отзывы</a>
+        {% endif %}
+    </div>
+{% empty %}
+    <p>У вас пока нет книг. <a href="{% url 'books:add_book' %}">Добавить первую книгу</a></p>
+{% endfor %}
+</div>
 {% endblock %}
