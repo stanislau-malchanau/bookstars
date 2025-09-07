@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.views.generic import ListView
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse
 
 from users.decorators import role_required
@@ -71,6 +73,7 @@ def add_book_wizard(request):
         'total_steps': len(BOOK_ADD_STEPS),
         'step_title': BOOK_ADD_STEPS[step]['title'],
         'book_data': request.session.get('book_data', {}),
+        'progress_width': step * 20,
     }
     
     return render(request, BOOK_ADD_STEPS[step]['template'], context)
@@ -122,7 +125,7 @@ def handle_step_post(request, step):
         # Шаг 4: Информация о книге на Amazon
         book_data['amazon_url'] = request.POST.get('amazon_url', '')
         book_data['language'] = request.POST.get('language', 'English')
-        book_data['marketplace'] = request.POST.get('marketplace', 'USA')
+        book_data['preferred_marketplace'] = request.POST.get('marketplace', 'US')
         book_data['goodreads_link'] = request.POST.get('goodreads_link', '')
         book_data['genre'] = request.POST.get('genre', '')
         
@@ -142,6 +145,7 @@ def handle_step_post(request, step):
                 genre=book_data['genre'],
                 owner=request.user,
                 status='draft'
+                preferred_marketplace=book_data.get('preferred_marketplace', 'US')
             )
             
             # Если была загружена обложка, сохраняем её
@@ -260,3 +264,59 @@ def get_reviewed(request, book_id):
         'form': form,
         'stars_cost': book.get_stars_cost()
     })
+
+@login_required
+def library(request):
+    """Страница библиотеки книг для обзора"""
+    # Получаем только "живые" книги, которые ищут читателей
+    books = Book.objects.filter(status='live').select_related('owner')
+    
+    # Фильтры
+    reading_type = request.GET.get('reading_type')
+    marketplace = request.GET.get('marketplace')
+    language = request.GET.get('language')
+    genre = request.GET.get('genre')
+    
+    if reading_type:
+        books = books.filter(reading_type=reading_type)
+    if marketplace:
+        # Предполагаем, что у Book есть поле preferred_marketplace
+        books = books.filter(preferred_marketplace=marketplace)
+    if language:
+        books = books.filter(language=language)
+    if genre:
+        books = books.filter(genre=genre)
+    
+    # Сортировка
+    sort_by = request.GET.get('sort', 'created_at')  # по умолчанию новые первыми
+    if sort_by == 'stars':
+        books = books.order_by('-stars_cost')  #_most stars
+    else:
+        books = books.order_by('-created_at')
+    
+    # Пагинация
+    paginator = Paginator(books, 12)  # 12 книг на странице
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Получаем уникальные значения для фильтров
+    reading_types = Book.READING_TYPES
+    languages = Book.objects.filter(status='live').values_list('language', flat=True).distinct()
+    genres = Book.objects.filter(status='live').values_list('genre', flat=True).distinct()
+    
+    context = {
+        'page_obj': page_obj,
+        'reading_types': reading_types,
+        'languages': languages,
+        'genres': genres,
+        'book_marketplace_choices': Book.MARKETPLACE_CHOICES,
+        'current_filters': {
+            'reading_type': reading_type,
+            'marketplace': marketplace,
+            'language': language,
+            'genre': genre,
+            'sort': sort_by,
+        }
+    }
+    
+    return render(request, 'books/library.html', context)

@@ -14,5 +14,6 @@ urlpatterns = [
     path('add/', views.add_book_wizard, name='add_book_wizard'),
     path('<int:book_id>/', views.view_book, name='view_book'),
     path('<int:book_id>/get-reviewed/', views.get_reviewed, name='get_reviewed'),
+    path('library/', views.library, name='library'),
     path('', include('core.urls')), # Пока пусто, но пригодится
 ]

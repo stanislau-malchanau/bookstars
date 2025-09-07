@@ -27,6 +27,30 @@ class Book(models.Model):
         ('canceled', 'Canceled'),
     ]
 
+    MARKETPLACE_CHOICES = [
+        ('CA', 'Amazon Canada'),
+        ('FR', 'France'),
+        ('DE', 'Germany'),
+        ('US', 'USA'),
+        ('GB', 'UK'),
+        ('ES', 'Spain'),
+        ('IT', 'Italy'),
+        ('NL', 'Netherlands'),
+        ('JP', 'Japan'),
+        ('MX', 'Mexico'),
+        ('BR', 'Brazil'),
+        ('ID', 'Indonesia'),
+        ('PL', 'Poland'),
+        ('AU', 'Australia'),
+    ]
+    
+    preferred_marketplace = models.CharField(
+        max_length=2, 
+        choices=MARKETPLACE_CHOICES,
+        blank=True,
+        help_text="Предпочтительный маркетплейс для получения отзывов"
+    )
+
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=255)
     asin = models.CharField(max_length=20, blank=True, null=True)
