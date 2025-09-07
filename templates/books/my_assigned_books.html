@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Books I'm Reviewing</h2>
+    
+    <!-- Tabs for status -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link {% if not current_status %}active{% endif %}" 
+               href="?">All</a>
+        </li>
+        {% for status_value, status_label in status_choices %}
+        <li class="nav-item">
+            <a class="nav-link {% if current_status == status_value %}active{% endif %}" 
+               href="?status={{ status_value }}">{{ status_label }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    
+    <!-- Assignments list -->
+    <div class="row">
+        {% for assignment in page_obj %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="row g-0">
+                    {% if assignment.book.cover_image %}
+                    <div class="col-md-4">
+                        <img src="{{ assignment.book.cover_image.url }}" class="img-fluid rounded-start" 
+                             alt="{{ assignment.book.title }}" style="height: 150px; object-fit: cover;">
+                    </div>
+                    {% endif %}
+                    <div class="col-md">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ assignment.book.title }}</h5>
+                            <p class="card-text">
+                                <small class="text-muted">by {{ assignment.book.author }}</small>
+                            </p>
+                            
+                            <span class="badge bg-{{ assignment.get_status_display|lower }}">
+                                {{ assignment.get_status_display }}
+                            </span>
+                            
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    Assigned: {{ assignment.assigned_at|date:"M d, Y" }}
+                                </small>
+                            </p>
+                            
+                            <div class="mt-2">
+                                <a href="{% url 'books:book_for_review' assignment.id %}" 
+                                   class="btn btn-sm btn-primary">View Details</a>
+                                
+                                {% if assignment.status == 'assigned' %}
+                                <form method="post" action="{% url 'books:cancel_assignment' assignment.id %}" 
+                                      class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this assignment?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">You don't have any assigned books yet.</p>
+            <p class="text-center">
+                <a href="{% url 'books:library' %}" class="btn btn-primary">Browse Library</a>
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{{ request.GET.urlencode }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{{ request.GET.urlencode }}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{{ request.GET.urlencode }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

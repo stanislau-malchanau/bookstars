@@ -55,10 +55,10 @@
         
         <div class="col-md-3">
             <select class="form-select" onchange="applyFilter('sort', this.value)">
-                <option value="created_at" {% if current_filters.sort == 'created_at' %}selected{% endif %}>
+                <option value="-created_at" {% if current_filters.sort == '-created_at' %}selected{% endif %}>
                     Newest First
                 </option>
-                <option value="stars" {% if current_filters.sort == 'stars' %}selected{% endif %}>
+                <option value="stars_cost" {% if current_filters.sort == 'stars_cost' %}selected{% endif %}>
                     Most Stars
                 </option>
             </select>
@@ -98,6 +98,16 @@
                         <a href="{% url 'books:book_detail' book.id %}" class="btn btn-sm btn-outline-primary">
                             View Details
                         </a>
+                        {% if not book.is_assigned %}
+                        <form method="post" action="{% url 'books:assign_book' book.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">
+                                Assign to Me
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="badge bg-info">Assigned</span>
+                        {% endif %}
                     </div>
                 </div>
             </div>

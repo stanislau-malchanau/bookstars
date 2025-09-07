@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Report Issue</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Book: {{ assignment.book.title }}</h5>
+            <p class="text-muted">by {{ assignment.book.author }}</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="issue_type" class="form-label">Issue Type *</label>
+                    <select class="form-select" id="issue_type" name="issue_type" required>
+                        <option value="">Select an issue</option>
+                        {% for value, label in issue_types %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" name="message" rows="4" 
+                              placeholder="Describe the issue in detail..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Report Issue</button>
+                <a href="{% url 'books:book_for_review' assignment.id %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

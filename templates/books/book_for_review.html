@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Book for Review</h2>
+    
+    <!-- Book Details -->
+    <div class="card mb-4">
+        <div class="row g-0">
+            {% if assignment.book.cover_image %}
+            <div class="col-md-3">
+                <img src="{{ assignment.book.cover_image.url }}" class="img-fluid rounded-start" 
+                     alt="{{ assignment.book.title }}" style="height: 300px; object-fit: cover;">
+            </div>
+            {% endif %}
+            <div class="col-md">
+                <div class="card-body">
+                    <h3 class="card-title">{{ assignment.book.title }}</h3>
+                    <p class="card-text">
+                        <strong>Author:</strong> {{ assignment.book.author }}
+                    </p>
+                    {% if assignment.book.asin %}
+                    <p class="card-text">
+                        <strong>ASIN:</strong> {{ assignment.book.asin }}
+                    </p>
+                    {% endif %}
+                    <p class="card-text">
+                        <strong>Description:</strong> {{ assignment.book.summary|default:"No description provided" }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Genre:</strong> {{ assignment.book.genre }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Language:</strong> {{ assignment.book.language }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Preferred Marketplace:</strong> {{ assignment.book.get_preferred_marketplace_display }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Due Date:</strong> 
+                        {{ assignment.assigned_at|date:"M d, Y"|add:" + 5 days" }}
+                        {% if assignment.is_overdue %}
+                        <span class="badge bg-danger">Overdue</span>
+                        {% endif %}
+                    </p>
+                    <p class="card-text">
+                        <strong>Word Count:</strong> {{ assignment.book.word_count|default:"N/A" }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Reward:</strong> {{ assignment.stars_reward }} stars
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status and Actions -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>Status: <span class="badge bg-{{ assignment.status }}">{{ assignment.get_status_display }}</span></h4>
+            
+            {% if assignment.status == 'assigned' %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="start_reading">
+                <button type="submit" class="btn btn-success">Start Reading</button>
+            </form>
+            
+            {% elif assignment.status == 'reading' %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="review_link" class="form-label">Amazon Review Link</label>
+                    <input type="url" class="form-control" id="review_link" name="review_link" 
+                           placeholder="https://www.amazon.com/review/...">
+                </div>
+                <input type="hidden" name="action" value="submit_review">
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </form>
+            
+            {% elif assignment.status == 'review_submitted' %}
+            <p>Review submitted. Waiting for admin confirmation.</p>
+            <a href="{{ assignment.review_link }}" target="_blank" class="btn btn-outline-primary">
+                View Submitted Review
+            </a>
+            
+            {% elif assignment.status == 'completed' %}
+            <p class="text-success">Assignment completed successfully!</p>
+            <p>You earned {{ assignment.stars_reward }} stars for this review.</p>
+            
+            {% elif assignment.status == 'cancelled' %}
+            <p class="text-muted">This assignment was cancelled.</p>
+            {% endif %}
+            
+            <div class="mt-3">
+                <a href="{% url 'books:report_issue' assignment.id %}" class="btn btn-outline-warning">
+                    Report Issue
+                </a>
+                {% if assignment.status == 'assigned' %}
+                <a href="{% url 'books:cancel_assignment' assignment.id %}" class="btn btn-outline-danger">
+                    Cancel Assignment
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

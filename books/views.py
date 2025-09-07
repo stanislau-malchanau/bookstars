@@ -6,13 +6,13 @@ from django.views.generic import ListView
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef
 from django.http import JsonResponse
 
 from users.decorators import role_required
 from users.mixins import RoleRequiredMixin
 
-from .models import Book
+from .models import Book, BookAssignment
 from .forms import BookForm, BookCoverForm, BookFileForm, GetReviewedForm
 
 from economy.models import StarBalance
@@ -294,6 +294,16 @@ def library(request):
     else:
         books = books.order_by('-created_at')
     
+    # Добавляем аннотацию: is_assigned — назначена ли книга текущему пользователю
+    books = books.annotate(
+        is_assigned=Exists(
+            BookAssignment.objects.filter(
+                book=OuterRef('pk'),
+                reader=request.user
+            )
+        )
+    )
+
     # Пагинация
     paginator = Paginator(books, 12)  # 12 книг на странице
     page_number = request.GET.get('page')
@@ -320,3 +330,130 @@ def library(request):
     }
     
     return render(request, 'books/library.html', context)
+
+@login_required
+def assign_book(request, book_id):
+    """Назначить книгу пользователю для обзора"""
+    book = get_object_or_404(Book, pk=book_id, status='live')
+    
+    # Проверяем, не назначен ли уже этот пользователь на эту книгу
+    if BookAssignment.objects.filter(book=book, reader=request.user).exists():
+        messages.warning(request, 'Вы уже назначены на эту книгу.')
+        return redirect('books:library')
+    
+    # Создаем назначение
+    assignment = BookAssignment.objects.create(
+        book=book,
+        reader=request.user,
+        stars_reward=book.get_stars_cost()  # Используем стоимость как награду
+    )
+    
+    messages.success(request, f'Вы успешно назначены на книгу "{book.title}". Начните чтение!')
+    return redirect('books:my_assigned_books')
+
+@login_required
+def my_assigned_books(request):
+    """Страница 'Books I'm Reviewing'"""
+    # Получаем назначения текущего пользователя
+    assignments = BookAssignment.objects.filter(reader=request.user).select_related('book', 'book__owner')
+    
+    # Фильтры по статусу
+    status_filter = request.GET.get('status')
+    if status_filter:
+        assignments = assignments.filter(status=status_filter)
+    
+    # Сортировка
+    sort_by = request.GET.get('sort', '-assigned_at')
+    assignments = assignments.order_by(sort_by)
+    
+    # Пагинация
+    paginator = Paginator(assignments, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'status_choices': BookAssignment.STATUS_CHOICES,
+        'current_status': status_filter,
+    }
+    
+    return render(request, 'books/my_assigned_books.html', context)
+
+@login_required
+def book_for_review(request, assignment_id):
+    """Страница деталей книги для обзора"""
+    assignment = get_object_or_404(
+        BookAssignment, 
+        pk=assignment_id, 
+        reader=request.user
+    )
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'start_reading':
+            assignment.start_reading()
+            messages.success(request, 'Вы начали чтение книги!')
+            
+        elif action == 'submit_review':
+            review_link = request.POST.get('review_link', '')
+            assignment.submit_review(review_link)
+            messages.success(request, 'Отзыв отправлен! Вам начислены звезды.')
+            
+        elif action == 'complete':
+            assignment.complete_assignment()
+            messages.success(request, 'Назначение завершено.')
+            
+        return redirect('books:book_for_review', assignment_id=assignment.id)
+    
+    return render(request, 'books/book_for_review.html', {
+        'assignment': assignment,
+    })
+
+@login_required
+def cancel_assignment(request, assignment_id):
+    """Отменить назначение"""
+    assignment = get_object_or_404(
+        BookAssignment, 
+        pk=assignment_id, 
+        reader=request.user
+    )
+    
+    if request.method == 'POST':
+        assignment.status = 'cancelled'
+        assignment.save()
+        messages.success(request, 'Назначение отменено.')
+        return redirect('books:my_assigned_books')
+    
+    return render(request, 'books/cancel_assignment.html', {
+        'assignment': assignment,
+    })
+
+@login_required
+def report_issue(request, assignment_id):
+    """Сообщить о проблеме с книгой"""
+    assignment = get_object_or_404(
+        BookAssignment, 
+        pk=assignment_id, 
+        reader=request.user
+    )
+    
+    if request.method == 'POST':
+        issue_type = request.POST.get('issue_type')
+        message = request.POST.get('message', '')
+        
+        # Здесь можно добавить логику отправки уведомления админу
+        # Пока просто показываем сообщение
+        messages.success(request, 'Сообщение отправлено администратору.')
+        return redirect('books:book_for_review', assignment_id=assignment.id)
+    
+    return render(request, 'books/report_issue.html', {
+        'assignment': assignment,
+        'issue_types': [
+            ('broken_link', 'Broken link'),
+            ('wrong_price', 'Wrong price'),
+            ('wrong_book', 'Wrong book'),
+            ('pdf_file_issue', 'PDF file issue'),
+            ('other', 'Other'),
+        ]
+    })
