@@ -1,5 +1,4 @@
-# Название
-Bookstars
+# Bookstars
 
 ## Описание
 SaaS platform that helps authors generate real, high-quality reviews for their low-content and non-fiction books on Amazon
@@ -16,19 +15,31 @@ SaaS platform that helps authors generate real, high-quality reviews for their l
     git clone https://github.com/stanislau-malchanau/bookstars.git
     cd bookstars
 
-2.  python -m venv venv
+2.  Создайте виртуальное окружение:
+    ```bash
+    python -m venv venv
     source venv/bin/activate  # Linux/macOS
     venv\Scripts\activate     # Windows
 
-3.  pip install -r requirements.txt
+3.  Установите зависимости:
+    ```bash
+    pip install -r requirements.txt
 
-4.  python manage.py migrate
+4.  Примените миграции:
+    ```bash
+    python manage.py migrate
 
-5.  python manage.py createsuperuser
+5.  Создайте суперпользователя:
+    ```bash
+    python manage.py createsuperuser
 
-6.  python manage.py runserver
+6.  Запустите сервер:
+    ```bash
+    python manage.py runserver
 
-7.  Откройте в браузере: http://127.0.0.1:8000
+7.  Откройте в браузере:
+    ```bash
+    http://127.0.0.1:8000
 
 ## Лицензия
 
