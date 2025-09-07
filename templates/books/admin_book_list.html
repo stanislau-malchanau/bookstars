@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Все книги (для админов)</h2>
+<ul>
+{% for book in books %}
+    <li>{{ book.title }} - {{ book.owner.username }} - {{ book.get_status_display }}</li>
+{% empty %}
+    <li>Нет книг.</li>
+{% endfor %}
+</ul>
+{% endblock %}

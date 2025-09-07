@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Книги на модерации</h2>
+{% for book in books %}
+    <div>
+        <h3>{{ book.title }}</h3>
+        <p>Автор: {{ book.author }}</p>
+        <p>Статус: {{ book.get_status_display }}</p>
+        <!-- Добавить кнопки для одобрения/отклонения -->
+    </div>
+{% empty %}
+    <p>Нет книг на модерации.</p>
+{% endfor %}
+{% endblock %}
