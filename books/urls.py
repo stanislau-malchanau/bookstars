@@ -10,5 +10,7 @@ urlpatterns = [
     path('my-books/', views.my_books, name='my_books'),
     path('moderate/', views.moderate_books, name='moderate_books'),
     path('admin-list/', views.AdminBookListView.as_view(), name='admin_book_list'),
+    path('add/', views.add_book, name='add_book'),
+    path('<int:book_id>/', views.view_book, name='view_book'),
     path('', include('core.urls')), # Пока пусто, но пригодится
 ]
