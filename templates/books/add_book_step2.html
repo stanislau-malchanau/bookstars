@@ -2,25 +2,65 @@
 
 {% block step_content %}
 <div class="row">
-    <div class="col-md-6">
-        <p class="text-muted">Complete a few steps in 3 minutes — and the book is added!</p>
+    <div class="col-md-8">
+        <p class="text-muted">Choose your readers</p>
         
-        <div class="mb-3">
-            <label for="title" class="form-label">Provide the full title *</label>
-            <input type="text" class="form-control" id="title" name="title" 
-                   value="{{ book_data.title|default:'' }}" required>
-        </div>
-        
-        <div class="mb-3">
-            <label for="author" class="form-label">Provide the author *</label>
-            <input type="text" class="form-control" id="author" name="author" 
-                   value="{{ book_data.author|default:'' }}" required>
-        </div>
-        
-        <div class="mb-3">
-            <label for="asin" class="form-label">Add book ASIN code (optional)</label>
-            <input type="text" class="form-control" id="asin" name="asin" 
-                   value="{{ book_data.asin|default:'' }}">
+        <div class="mb-4">
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="reading_type" 
+                       id="standard" value="standard" 
+                       {% if book_data.reading_type == 'standard' %}checked{% endif %} required>
+                <label class="form-check-label" for="standard">
+                    <h5>Standard</h5>
+                    <p class="text-muted">Your reader will download and read your book, then review it on Amazon</p>
+                    <div class="border p-3 mt-2">
+                        <label for="book_file" class="form-label">Drop files here to upload</label>
+                        <input type="file" class="form-control" id="book_file" name="book_file"
+                               accept=".pdf,.epub,.doc,.docx">
+                        <small class="text-muted">Accepted file types: .pdf, .epub, .doc, .docx (Max. 50 MB)</small>
+                        
+                        {% if book_data.has_book_file %}
+                        <div class="alert alert-success mt-2 mb-0">
+                            <i class="fas fa-check-circle"></i> Файл успешно загружен: {{ book_data.book_file_name }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </label>
+            </div>
+            
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="reading_type" 
+                       id="kindle_unlimited" value="kindle_unlimited"
+                       {% if book_data.reading_type == 'kindle_unlimited' %}checked{% endif %}>
+                <label class="form-check-label" for="kindle_unlimited">
+                    <h5>Kindle Unlimited</h5>
+                    <p class="text-muted">Your reader will read and review your book using Kindle Unlimited. 
+                    Requires your book to be free KU subscribers. Amazon.com does not label reviews 
+                    from a Kindle Unlimited reader as a Verified Purchased review.</p>
+                </label>
+            </div>
+            
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="reading_type" 
+                       id="verified_ebook" value="verified_ebook"
+                       {% if book_data.reading_type == 'verified_ebook' %}checked{% endif %}>
+                <label class="form-check-label" for="verified_ebook">
+                    <h5>Verified Purchase (eBook)</h5>
+                    <p class="text-muted">Your reader will purchase your book and leave a Verified Purchase review. 
+                    Your readers will read your book using Kindle device or app.</p>
+                </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="reading_type" 
+                       id="verified_print" value="verified_print"
+                       {% if book_data.reading_type == 'verified_print' %}checked{% endif %}>
+                <label class="form-check-label" for="verified_print">
+                    <h5>Verified Print Copy</h5>
+                    <p class="text-muted">Your reader will purchase your book and leave a Verified Purchase review. 
+                    With photo and video as an option</p>
+                </label>
+            </div>
         </div>
     </div>
 </div>

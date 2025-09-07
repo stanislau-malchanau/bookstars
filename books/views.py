@@ -10,7 +10,7 @@ from users.decorators import role_required
 from users.mixins import RoleRequiredMixin
 
 from .models import Book
-from .forms import BookForm, BookCoverForm
+from .forms import BookForm, BookCoverForm, BookFileForm
 
 import json
 import os
@@ -82,13 +82,22 @@ def handle_step_post(request, step):
         book_data['asin'] = request.POST.get('asin', '')
         
     elif step == 2:
-        # Шаг 2: Выбор типа чтения
+        # Шаг 2: Выбор типа чтения и загрузка файла
         book_data['reading_type'] = request.POST.get('reading_type', '')
-        # Сохраняем выбранные файлы (если есть)
-        if request.FILES.get('book_file'):
-            # Пока просто сохраняем в сессию информацию о файле
-            # Реальную загрузку файлов реализуем позже
-            book_data['has_file'] = True
+        
+        # Обработка загрузки файла
+        form = BookFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            book_file = request.FILES.get('book_file')
+            if book_file:
+                book_data['book_file_name'] = book_file.name
+                book_data['has_book_file'] = True
+        else:
+            # Добавляем ошибки формы в messages
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+            return redirect(f"{request.path}?step=2")
         
     elif step == 3:
         # Шаг 3: Загрузка обложки
@@ -138,6 +147,15 @@ def handle_step_post(request, step):
                 book.cover_image.save(
                     book_data['cover_image_name'],
                     cover_file,
+                    save=True
+                )
+            
+            # Если был загружен файл книги, сохраняем его
+            if 'book_file_name' in book_data and request.FILES.get('book_file'):
+                book_file = request.FILES['book_file']
+                book.book_file.save(
+                    book_data['book_file_name'],
+                    book_file,
                     save=True
                 )
             
