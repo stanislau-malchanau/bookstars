@@ -144,7 +144,7 @@ def handle_step_post(request, step):
                 language=book_data['language'],
                 genre=book_data['genre'],
                 owner=request.user,
-                status='draft'
+                status='draft',
                 preferred_marketplace=book_data.get('preferred_marketplace', 'US')
             )
             
