@@ -1,0 +1,27 @@
+{% extends "books/add_book_base.html" %}
+
+{% block step_content %}
+<div class="row">
+    <div class="col-md-8">
+        <p class="text-muted">Add the Front Cover</p>
+        <p class="small text-muted">
+            Please provide the 2D image of your front cover only. We do not accept 3D models or front-spine-back covers. 
+            To grab your exact Amazon cover, you can go to your book's Amazon page, then right-click on the cover image, 
+            and click 'Save image as'.
+        </p>
+        
+        <div class="mb-3">
+            <label for="cover_image" class="form-label">Upload Front Cover Image</label>
+            <input type="file" class="form-control" id="cover_image" name="cover_image" 
+                   accept="image/*">
+            <div class="form-text">Accepted file types: JPG, JPEG, PNG, GIF (Max. 5 MB file)</div>
+        </div>
+        
+        {% if book_data.has_cover %}
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> Обложка успешно загружена: {{ book_data.cover_image_name }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

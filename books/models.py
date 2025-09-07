@@ -1,6 +1,10 @@
 from django.db import models
 from users.models import User
 
+def book_cover_upload_path(instance, filename):
+    """Путь для сохранения обложки книги"""
+    return f'books/covers/{instance.owner.id}/{instance.id or "temp"}/{filename}'
+
 class Book(models.Model):
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=255)
@@ -19,3 +23,10 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+    
+    cover_image = models.ImageField(
+        upload_to=book_cover_upload_path,
+        blank=True,
+        null=True,
+        help_text="Загрузите обложку книги"
+    )

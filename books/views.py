@@ -1,13 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.generic import ListView
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.http import JsonResponse
+
 from users.decorators import role_required
 from users.mixins import RoleRequiredMixin
-from django.views.generic import ListView
+
 from .models import Book
-from .forms import BookForm
-from django.http import JsonResponse
+from .forms import BookForm, BookCoverForm
+
 import json
+import os
 
 @login_required
 def my_books(request):
@@ -78,12 +84,27 @@ def handle_step_post(request, step):
     elif step == 2:
         # Шаг 2: Выбор типа чтения
         book_data['reading_type'] = request.POST.get('reading_type', '')
-        # Здесь можно добавить обработку файлов
+        # Сохраняем выбранные файлы (если есть)
+        if request.FILES.get('book_file'):
+            # Пока просто сохраняем в сессию информацию о файле
+            # Реальную загрузку файлов реализуем позже
+            book_data['has_file'] = True
         
     elif step == 3:
         # Шаг 3: Загрузка обложки
-        # Пока заглушка, реализуем позже
-        pass
+        form = BookCoverForm(request.POST, request.FILES)
+        if form.is_valid():
+            cover_file = request.FILES.get('cover_image')
+            if cover_file:
+                # Сохраняем файл временно в сессию или на диск
+                # Для простоты сохраним путь к файлу в сессии
+                book_data['cover_image_name'] = cover_file.name
+                # Файл будет сохранен позже при создании книги
+                # Пока просто отметим, что обложка загружена
+                book_data['has_cover'] = True
+        else:
+            messages.error(request, 'Ошибка при загрузке обложки')
+            return redirect(f"{request.path}?step=3")
         
     elif step == 4:
         # Шаг 4: Информация о книге на Amazon
@@ -94,7 +115,7 @@ def handle_step_post(request, step):
         book_data['genre'] = request.POST.get('genre', '')
         
     elif step == 5:
-        # Шаг 5: Финальная информация
+        # Шаг 5: Финальная информация и сохранение
         book_data['word_count'] = request.POST.get('word_count', '')
         book_data['summary'] = request.POST.get('summary', '')
         book_data['author_info'] = request.POST.get('author_info', '')
@@ -108,8 +129,18 @@ def handle_step_post(request, step):
                 language=book_data['language'],
                 genre=book_data['genre'],
                 owner=request.user,
-                status='draft'  # Начальный статус
+                status='draft'
             )
+            
+            # Если была загружена обложка, сохраняем её
+            if 'cover_image_name' in book_data and request.FILES.get('cover_image'):
+                cover_file = request.FILES['cover_image']
+                book.cover_image.save(
+                    book_data['cover_image_name'],
+                    cover_file,
+                    save=True
+                )
+            
             # Очищаем сессию
             del request.session['book_data']
             messages.success(request, 'Книга успешно добавлена и отправлена на модерацию!')

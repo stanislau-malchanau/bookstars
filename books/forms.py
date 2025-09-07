@@ -12,3 +12,12 @@ class BookForm(forms.ModelForm):
             'language': forms.Select(attrs={'class': 'form-control'}),
             'genre': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+class BookCoverForm(forms.Form):
+    cover_image = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*'  # Только изображения
+        })
+    )
