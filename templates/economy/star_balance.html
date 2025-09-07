@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Ваш баланс звезд</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h3 class="display-4">{{ balance.balance }}</h3>
+            <p class="text-muted">звезд доступно</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="border rounded p-3">
+                        <h5>{{ balance.total_earned }}</h5>
+                        <p class="text-muted small">всего заработано</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3">
+                        <h5>{{ balance.total_spent }}</h5>
+                        <p class="text-muted small">всего потрачено</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3">
+                        <h5>{{ balance.balance }}</h5>
+                        <p class="text-muted small">текущий баланс</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <h4>Последние операции</h4>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Тип</th>
+                    <th>Количество</th>
+                    <th>Причина</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.created_at|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        {% if transaction.transaction_type == 'earned' %}
+                            <span class="badge bg-success">Получено</span>
+                        {% else %}
+                            <span class="badge bg-danger">Потрачено</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if transaction.transaction_type == 'earned' %}
+                            +{{ transaction.amount }}
+                        {% else %}
+                            -{{ transaction.amount }}
+                        {% endif %}
+                    </td>
+                    <td>{{ transaction.reason }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">Нет операций</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="alert alert-info">
+        <h5>Как получить звезды?</h5>
+        <p>Читайте и оставляйте отзывы на книги других авторов, чтобы получать звезды. 
+        Затем используйте свои звезды, чтобы получить отзывы на свои книги!</p>
+    </div>
+</div>
+{% endblock %}

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'core',
     'users',
     'books',
+    'economy',
 ]
 
 MIDDLEWARE = [
