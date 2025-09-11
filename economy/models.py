@@ -7,9 +7,9 @@ User = get_user_model()
 class StarBalance(models.Model):
     """Баланс звезд пользователя"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='star_balance')
-    balance = models.IntegerField(default=0, help_text="Текущий баланс звезд")
-    total_earned = models.IntegerField(default=0, help_text="Всего заработано звезд")
-    total_spent = models.IntegerField(default=0, help_text="Всего потрачено звезд")
+    balance = models.IntegerField(default=0)
+    total_earned = models.IntegerField(default=0)
+    total_spent = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

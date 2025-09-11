@@ -8,6 +8,8 @@ from django.core.files.base import ContentFile
 from django.core.paginator import Paginator
 from django.db.models import Q, Exists, OuterRef
 from django.http import JsonResponse
+from .models import Book
+from economy.models import StarBalance, StarTransaction
 
 from users.decorators import role_required
 from users.mixins import RoleRequiredMixin
@@ -122,7 +124,7 @@ def handle_step_post(request, step):
                 # Пока просто отметим, что обложка загружена
                 book_data['has_cover'] = True
         else:
-            messages.error(request, 'Ошибка при загрузке обложки')
+            messages.error(request, 'Error loading cover')
             return redirect(f"{request.path}?step=3")
         
     elif step == 4:
@@ -172,10 +174,10 @@ def handle_step_post(request, step):
             
             # Очищаем сессию
             del request.session['book_data']
-            messages.success(request, 'Книга успешно добавлена и отправлена на модерацию!')
+            messages.success(request, 'The book has been successfully added and sent for moderation!')
             return redirect('books:my_books')
         except Exception as e:
-            messages.error(request, f'Ошибка при сохранении книги: {str(e)}')
+            messages.error(request, f'Error saving book: {str(e)}')
             return redirect('books:add_book_wizard')
     
     # Сохраняем данные в сессию
@@ -208,7 +210,7 @@ def edit_book(request, book_id):
             if request.FILES.get('cover_image'):
                 book.cover_image = request.FILES['cover_image']
             form.save()
-            messages.success(request, 'Книга успешно обновлена!')
+            messages.success(request, 'The book has been successfully updated!')
             return redirect('books:view_book', book_id=book.id)
     else:
         form = BookForm(instance=book)
@@ -244,7 +246,7 @@ def get_reviewed(request, book_id):
     
     # Проверяем, что книга в статусе "live"
     if not book.is_live:
-        messages.error(request, 'Книгу можно отправить на обзор только в статусе "Live"')
+        messages.error(request, 'The book can be sent for review only in the "Live" status')
         return redirect('books:view_book', book_id=book.id)
     
     if request.method == 'POST':
@@ -270,7 +272,7 @@ def get_reviewed(request, book_id):
                 star_balance = StarBalance.objects.create(user=request.user)
             
             if star_balance.balance < stars_cost:
-                messages.error(request, f'Недостаточно звезд. Требуется {stars_cost}, у вас {star_balance.balance}')
+                messages.error(request, f'Not enough stars. Required {stars_cost}, you have {star_balance.balance}')
                 return redirect('books:get_reviewed', book_id=book.id)
             
             # Списываем звезды
@@ -288,10 +290,10 @@ def get_reviewed(request, book_id):
                 book.review_requested_at = timezone.now()
                 book.save()
                 
-                messages.success(request, f'Запрос на обзор отправлен! Списано {stars_cost} звезд.')
+                messages.success(request, f'Review request sent! Spent {stars_cost} stars.')
                 return redirect('books:my_books')
             else:
-                messages.error(request, 'Ошибка при списании звезд')
+                messages.error(request, 'Error writing off stars')
                 return redirect('books:get_reviewed', book_id=book.id)
     else:
         form = GetReviewedForm()
@@ -416,7 +418,7 @@ def my_assigned_books(request):
     
     context = {
         'page_obj': page_obj,
-        'status_choices': BookAssignment.STATUS_CHOICES,
+        'status_choices': BookAssignment.ASSIGNMENT_STATUS_CHOICES,
         'current_status': status_filter,
     }
     

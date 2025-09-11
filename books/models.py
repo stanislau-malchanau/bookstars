@@ -29,6 +29,19 @@ class Book(models.Model):
         ('canceled', 'Canceled'),
     ]
 
+    LANGUAGE_CHOICES = [
+        ('English', 'English'),
+        ('Deutsch', 'Deutsch'),
+        ('French', 'French'),
+        ('Italian', 'Italian'),
+        ('Spanish', 'Spanish'),
+        ('Portuguese', 'Portuguese'),
+        ('Russian', 'Russian'),
+        ('Ukrainian', 'Ukrainian'),
+        ('Polish', 'Polish'),
+        ('Other', 'Other'),
+    ]
+
     MARKETPLACE_CHOICES = [
         ('CA', 'Amazon Canada'),
         ('FR', 'France'),
@@ -45,48 +58,54 @@ class Book(models.Model):
         ('PL', 'Poland'),
         ('AU', 'Australia'),
     ]
-    
-    preferred_marketplace = models.CharField(
-        max_length=2, 
-        choices=MARKETPLACE_CHOICES,
-        blank=True,
-        help_text="Предпочтительный маркетплейс для получения отзывов"
-    )
 
-    title = models.CharField(max_length=255)
-    author = models.CharField(max_length=255)
-    asin = models.CharField(max_length=20, blank=True, null=True)
-    language = models.CharField(max_length=50)
-    genre = models.CharField(max_length=100)
-    status = models.CharField(max_length=20, choices=[
-        ('draft', 'Draft'),
-        ('moderation', 'Moderation'),
-        ('live', 'Live'),
-        ('rejected', 'Rejected'),
-    ], default='draft')
+    GENRE_CHOICES = [
+        ('coloring_books', 'Coloring Books | Low Content'),
+        ('journals', 'Journals | Low Content'),
+        ('planners', 'Planners | Low Content'),
+        ('recipe_books', 'Recipe Books | Low Content'),
+        ('quote_books', 'Quote Books | Low Content'),
+        ('activity_books', 'Activity Books | Low Content'),
+        ('trivia_books', 'Trivia Books | Low Content'),
+        ('sudoku', 'Sudoku | Low Content'),
+        ('crosswords', 'Crosswords | Low Content'),
+        ('word_search', 'Word Search | Low Content'),
+        ('childrens_book', 'Children\'s Book | Low Content'),
+        ('other_low_content', 'Other Low Content / No Content'),
+        ('religion_and_spirituality', 'Religion and Spirituality | Non-fiction'),
+        ('health_fitness_dieting', 'Health, Fitness and Dieting | Non-fiction'),
+        ('politics_social_sciences', 'Politics and Social Sciences | Non-fiction'),
+        ('cook_books_food_wine', 'Cook Books, Food and Wine | Non-fiction'),
+        ('business_money', 'Business and Money | Non-fiction'),
+        ('parenting_relationship', 'Parenting and Relationship | Non-fiction'),
+        ('self_help', 'Self Help | Non-fiction'),
+        ('biography_memories', 'Biography and Memories | Non-fiction'),
+        ('education_teaching', 'Education and Teaching | Non-fiction'),
+        ('crafts_hobbies_home', 'Crafts, Hobbies and Home | Non-fiction'),
+        ('other_non_fiction', 'Other Non-fiction'),
+        ('fiction', 'Fiction'),
+        ('romance', 'Romance | Fiction'),
+        ('sci-fi', 'Sci-Fi | Fiction'),
+        ('non_english', 'Non-English'),
+    ]
+
+    title = models.CharField(max_length=255, help_text="Enter full book name including subtitle")
+    author = models.CharField(max_length=255, help_text="Enter author's full name")
+    asin = models.CharField(max_length=30, help_text="You can find in book description")
+    language = models.CharField(max_length=50, choices=LANGUAGE_CHOICES, default='English')
+    genre = models.CharField(max_length=100, choices=GENRE_CHOICES, default='other_low_content')
+    preferred_marketplace = models.CharField(max_length=2, choices=MARKETPLACE_CHOICES, help_text="Preferred marketplace for reviews")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    cover_image = models.ImageField(
-        upload_to=book_cover_upload_path,
-        blank=True,
-        null=True,
-        help_text="Загрузите обложку книги"
-    )
-
-    book_file = models.FileField(
-        upload_to=book_file_upload_path,
-        blank=True,
-        null=True,
-        help_text="Загрузите файл книги (PDF, EPUB, DOC, DOCX)"
-    )
-
     reading_type = models.CharField(max_length=20, choices=READING_TYPES, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+
+    cover_image = models.ImageField(upload_to=book_cover_upload_path, help_text="Upload book cover")
+    book_file = models.FileField(upload_to=book_file_upload_path, help_text="Upload book file (PDF, EPUB, DOC, DOCX)")
     
     # Поля для разных типов чтения
-    book_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    book_price = models.DecimalField(max_digits=10, decimal_places=2)
     print_book_link = models.URLField(null=True, blank=True)
     print_book_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     
@@ -99,7 +118,7 @@ class Book(models.Model):
     add_video_review = models.BooleanField(default=False)
     
     # Стоимость в звездах для получения обзоров
-    stars_cost = models.IntegerField(default=0, help_text="Количество звезд, необходимых для получения обзоров")
+    stars_cost = models.IntegerField(default=0, help_text="Number of stars required to get reviews")
     
     # Дата активации получения обзоров
     review_requested_at = models.DateTimeField(null=True, blank=True)
@@ -127,7 +146,7 @@ class Book(models.Model):
 class BookAssignment(models.Model):
     """Назначение книги читателю для обзора"""
     
-    STATUS_CHOICES = [
+    ASSIGNMENT_STATUS_CHOICES = [
         ('assigned', 'Assigned'),           # Назначена
         ('reading', 'Reading'),             # В процессе чтения
         ('review_submitted', 'Review Submitted'),  # Отзыв отправлен
@@ -139,7 +158,7 @@ class BookAssignment(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='assignments')
     reader = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_books')
     
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='assigned')
+    status = models.CharField(max_length=20, choices=ASSIGNMENT_STATUS_CHOICES, default='assigned')
     
     # Дата назначения
     assigned_at = models.DateTimeField(default=timezone.now)

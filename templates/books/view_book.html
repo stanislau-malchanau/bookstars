@@ -4,7 +4,7 @@
 <div class="container">
     <h2>{{ book.title }}</h2>
     <p><strong>Author:</strong> {{ book.author }}</p>
-    <p><strong>ASIN:</strong> {{ book.asin|default:"Не указан" }}</p>
+    <p><strong>ASIN:</strong> {{ book.asin|default:"Not specified" }}</p>
     <p><strong>Language:</strong> {{ book.language }}</p>
     <p><strong>Genre:</strong> {{ book.genre }}</p>
     <p><strong>Status:</strong> {{ book.get_status_display }}</p>

@@ -38,12 +38,12 @@ class BookFileForm(forms.Form):
         if file:
             # Проверка размера файла (максимум 50MB)
             if file.size > 50 * 1024 * 1024:  # 50MB в байтах
-                raise forms.ValidationError('Файл слишком большой. Максимальный размер 50MB.')
+                raise forms.ValidationError('The file is too large. Maximum size is 50MB.')
             
             # Проверка типа файла
             ext = file.name.split('.')[-1].lower()
             if ext not in self.BOOK_FILE_TYPES:
-                raise forms.ValidationError(f'Недопустимый тип файла. Разрешены: {", ".join(self.BOOK_FILE_TYPES)}')
+                raise forms.ValidationError(f'Invalid file type. Allowed: {", ".join(self.BOOK_FILE_TYPES)}')
         
         return file
     
@@ -51,7 +51,7 @@ class GetReviewedForm(forms.Form):
     reading_type = forms.ChoiceField(
         choices=Book.READING_TYPES,
         widget=forms.RadioSelect,
-        label="Выберите тип обзора"
+        label="Select review type"
     )
     
     # Для Verified eBook
@@ -87,21 +87,21 @@ class GetReviewedForm(forms.Form):
         if reading_type == 'verified_ebook':
             book_price = cleaned_data.get('book_price')
             if book_price is None:
-                raise forms.ValidationError("Укажите цену книги для Verified Purchase (eBook)")
+                raise forms.ValidationError("Specify the book price for Verified Purchase (eBook)")
         
         # Валидация для Verified Print
         if reading_type == 'verified_print':
             print_book_link = cleaned_data.get('print_book_link')
             print_book_price = cleaned_data.get('print_book_price')
             if not print_book_link:
-                raise forms.ValidationError("Укажите ссылку на печатную книгу")
+                raise forms.ValidationError("Please provide a link to the printed book")
             if print_book_price is None:
-                raise forms.ValidationError("Укажите цену печатной книги")
+                raise forms.ValidationError("Specify the price of the printed book")
         
         # Валидация Goodreads
         add_goodreads = cleaned_data.get('add_goodreads_review')
         goodreads_link = cleaned_data.get('goodreads_link')
         if add_goodreads and not goodreads_link:
-            raise forms.ValidationError("Укажите ссылку на Goodreads")
+            raise forms.ValidationError("Please provide a link to Goodreads")
             
         return cleaned_data
