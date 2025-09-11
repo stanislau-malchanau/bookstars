@@ -79,10 +79,12 @@
                     <p class="card-text">
                         <small class="text-muted">by {{ book.author }}</small>
                     </p>
+
+                    <p class="card-text">{{ book.word_count }}</p>
                     
                     <!-- Reading type badge -->
                     <span class="badge bg-primary mb-2">
-                        {{ book.get_reading_type_display }}
+                        {{ book.reading_type }}
                     </span>
                     
                     <p class="card-text">{{ book.genre }}</p>

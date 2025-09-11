@@ -2,16 +2,17 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from users.models import User
+from economy.models import StarBalance
 
 import os
 
 def book_cover_upload_path(instance, filename):
     """Путь для сохранения обложки книги"""
-    return f'books/covers/{instance.owner.id}/{instance.id or "temp"}/{filename}'
+    return f'media/books/covers/{instance.owner.id}/{instance.id or "temp"}/{filename}'
 
 def book_file_upload_path(instance, filename):
     """Путь для сохранения файла книги"""
-    return f'books/files/{instance.owner.id}/{instance.id or "temp"}/{filename}'
+    return f'media/books/files/{instance.owner.id}/{instance.id or "temp"}/{filename}'
 
 class Book(models.Model):
     READING_TYPES = [
@@ -91,21 +92,24 @@ class Book(models.Model):
 
     title = models.CharField(max_length=255, help_text="Enter full book name including subtitle")
     author = models.CharField(max_length=255, help_text="Enter author's full name")
-    asin = models.CharField(max_length=30, help_text="You can find in book description")
+    asin = models.CharField(max_length=30, null=True, blank=True, help_text="You can find in book description")
     language = models.CharField(max_length=50, choices=LANGUAGE_CHOICES, default='English')
     genre = models.CharField(max_length=100, choices=GENRE_CHOICES, default='other_low_content')
     preferred_marketplace = models.CharField(max_length=2, choices=MARKETPLACE_CHOICES, help_text="Preferred marketplace for reviews")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    word_count = models.CharField(max_length=255, choices=STATUS_CHOICES, null=True, blank=True)
+    summary = models.CharField(max_length=255, choices=STATUS_CHOICES, null=True, blank=True)
+    author_info = models.CharField(max_length=255, choices=STATUS_CHOICES, null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     reading_type = models.CharField(max_length=20, choices=READING_TYPES, blank=True)
 
-    cover_image = models.ImageField(upload_to=book_cover_upload_path, help_text="Upload book cover")
-    book_file = models.FileField(upload_to=book_file_upload_path, help_text="Upload book file (PDF, EPUB, DOC, DOCX)")
+    cover_image = models.ImageField(upload_to=book_cover_upload_path, null=True, blank=True, help_text="Upload book cover")
+    book_file = models.FileField(upload_to=book_file_upload_path, null=True, blank=True, help_text="Upload book file (PDF, EPUB, DOC, DOCX)")
     
     # Поля для разных типов чтения
-    book_price = models.DecimalField(max_digits=10, decimal_places=2)
+    book_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     print_book_link = models.URLField(null=True, blank=True)
     print_book_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     
@@ -176,8 +180,8 @@ class BookAssignment(models.Model):
     stars_reward = models.IntegerField(default=100)
     
     # Отслеживание прогресса
-    pages_read = models.IntegerField(default=0)
-    total_pages = models.IntegerField(default=0)
+    # pages_read = models.IntegerField(default=0)
+    # total_pages = models.IntegerField(default=0)
     
     def __str__(self):
         return f"{self.reader.username} -> {self.book.title}"
@@ -206,6 +210,11 @@ class BookAssignment(models.Model):
     def complete_assignment(self):
         """Завершить назначение"""
         self.status = 'completed'
+        self.save()
+    
+    def cancel_assignment(self):
+        """Отменить назначение"""
+        self.status = 'cancelled'
         self.save()
     
     @property

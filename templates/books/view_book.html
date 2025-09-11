@@ -3,16 +3,71 @@
 {% block content %}
 <div class="container">
     <h2>{{ book.title }}</h2>
-    <p><strong>Author:</strong> {{ book.author }}</p>
-    <p><strong>ASIN:</strong> {{ book.asin|default:"Not specified" }}</p>
-    <p><strong>Language:</strong> {{ book.language }}</p>
-    <p><strong>Genre:</strong> {{ book.genre }}</p>
-    <p><strong>Status:</strong> {{ book.get_status_display }}</p>
-    <p><strong>Date created:</strong> {{ book.created_at }}</p>
-
-    <a href="{% url 'books:my_books' %}" class="btn btn-secondary">Back</a>
-    {% if book.status == 'draft' or book.status == 'rejected' %}
-        <a href="{% url 'books:edit_book' book.pk %}" class="btn btn-primary">Edit</a>
-    {% endif %}
+    
+    <div class="card mb-4">
+        <div class="row g-0">
+            {% if book.cover_image %}
+            <div class="col-md-2">
+                <img src="{{ book.cover_image.url }}" class="img-fluid rounded-start" alt="{{ book.title }}">
+            </div>
+            {% endif %}
+            <div class="col-md">
+                <div class="card-body">
+                    <p><strong>Author:</strong> {{ book.author }}</p>
+                    <p><strong>ASIN:</strong> {{ book.asin|default:"Не указан" }}</p>
+                    <p><strong>Language:</strong> {{ book.language }}</p>
+                    <p><strong>Genre:</strong> {{ book.genre }}</p>
+                    <p><strong>Status:</strong> {{ book.get_status_display }}</p>
+                    <p><strong>Marketplace:</strong> {{ book.preferred_marketplace }}</p>
+                    <p><strong>Review type:</strong> {{ book.reading_type }}</p>
+                    
+                    {% if book.summary %}
+                    <p><strong>Summary:</strong> {{ book.summary }}</p>
+                    {% endif %}
+                    
+                    {% if book.word_count %}
+                    <p><strong>Word count:</strong> {{ book.word_count }}</p>
+                    {% endif %}
+                    
+                    {% if book.author_info %}
+                    <p><strong>About author:</strong> {{ book.author_info }}</p>
+                    {% endif %}
+                    
+                    {% if book.book_price %}
+                    <p><strong>Book price:</strong> {{ book.book_price }} USD</p>
+                    {% endif %}
+                    
+                    {% if book.print_book_link %}
+                    <p><strong>Print book link:</strong> {{ book.print_book_link }}</p>
+                    {% endif %}
+                    
+                    {% if book.print_book_price %}
+                    <p><strong>Print book price:</strong> {{ book.print_book_price }} USD</p>
+                    {% endif %}
+                    
+                    {% if book.goodreads_link %}
+                    <p><strong>Goodreads link:</strong> {{ book.goodreads_link }}</p>
+                    {% endif %}
+                    
+                    {% if book.add_goodreads_review %}
+                    <p><strong>Add Goodreads review:</strong> Yes</p>
+                    {% endif %}
+                    
+                    {% if book.add_photo_review %}
+                    <p><strong>Add photo review:</strong> Yes</p>
+                    {% endif %}
+                    
+                    {% if book.add_video_review %}
+                    <p><strong>Add video review:</strong> Yes</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="{% url 'books:my_books' %}" class="btn btn-sm btn-secondary">Back</a>
+        <a href="{% url 'books:edit_book' book.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+    </div>
 </div>
 {% endblock %}
