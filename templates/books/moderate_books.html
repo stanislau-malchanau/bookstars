@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Книги на модерации</h2>
-{% for book in books %}
-    <div>
-        <h3>{{ book.title }}</h3>
-        <p>Автор: {{ book.author }}</p>
-        <p>Статус: {{ book.get_status_display }}</p>
-        <!-- Добавить кнопки для одобрения/отклонения -->
-    </div>
-{% empty %}
-    <p>Нет книг на модерации.</p>
-{% endfor %}
+<div class="container">
+    <h2>Books on moderation</h2>
+    {% for book in books %}
+        <div>
+            <h3>{{ book.title }}</h3>
+            <p>Author: {{ book.author }}</p>
+            <p>Status: {{ book.get_status_display }}</p>
+            <!-- Добавить кнопки для одобрения/отклонения -->
+        </div>
+    {% empty %}
+        <p>No books for moderation.</p>
+    {% endfor %}
+</div>
 {% endblock %}

@@ -17,7 +17,7 @@
                     <h5 class="card-title">{{ book.title }}</h5>
                     <p class="card-text">
                         <small class="text-muted">
-                            Статус: 
+                            Status: 
                             {% if book.status == 'live' %}
                                 <span class="badge bg-success">Live</span>
                             {% elif book.status == 'draft' %}
@@ -31,8 +31,8 @@
                     </p>
                     <p class="card-text">
                         <small class="text-muted">
-                            Язык: {{ book.language }} | 
-                            Рынок: {{ book.preferred_marketplace|default:"Не указан" }}
+                            Language: {{ book.language }} | 
+                            Marketplace: {{ book.preferred_marketplace|default:"Не указан" }}
                         </small>
                     </p>
                 </div>
@@ -41,11 +41,11 @@
     </div>
     
     <div class="alert alert-info">
-        <strong>Примечание:</strong> Ваш читатель прочитает и оставит отзыв на вашу книгу в течение 5 дней.
+        <strong>Note:</strong> Your reader will read and review your book within 5 days.
     </div>
     
-    <h3>ВЫБЕРИТЕ ВАРИАНТЫ ОБЗОРА</h3>
-    <p class="text-muted">Выберите один из вариантов ниже</p>
+    <h3>View Options</h3>
+    <p class="text-muted">Please select one of the options below</p>
     
     <form method="post">
         {% csrf_token %}
@@ -72,13 +72,13 @@
                                 <h5>{{ radio.choice_label }}</h5>
                                 <p class="text-muted small">
                                     {% if radio.choice_value == 'standard' %}
-                                        Ваш читатель скачает и прочитает вашу книгу, затем оставит отзыв на Amazon
+                                        Your reader will download and read your book, then leave a review on Amazon
                                     {% elif radio.choice_value == 'kindle_unlimited' %}
-                                        Ваш читатель прочитает и оставит отзыв на вашу книгу, используя Kindle Unlimited
+                                        Your reader will read and review your book using Kindle Unlimited
                                     {% elif radio.choice_value == 'verified_ebook' %}
-                                        Ваш читатель купит книгу и оставит отзыв Verified Purchase
+                                        Your reader will buy the book and leave a review Verified Purchase
                                     {% elif radio.choice_value == 'verified_print' %}
-                                        Ваш читатель купит книгу и оставит отзыв Verified Purchase с фото/видео
+                                        Your reader will buy the book and leave a Verified Purchase review with photo/video
                                     {% endif %}
                                 </p>
                                 
@@ -88,16 +88,16 @@
                                          style="{% if form.reading_type.value != 'verified_ebook' %}display:none;{% endif %}">
                                         <div class="mb-2">
                                             <label for="{{ form.book_price.id_for_label }}" class="form-label">
-                                                Цена вашей книги на Amazon, USD *
+                                                The price of your book on Amazon, USD *
                                             </label>
                                             {{ form.book_price }}
                                             {% if form.book_price.errors %}
                                                 <div class="text-danger">{{ form.book_price.errors }}</div>
                                             {% endif %}
-                                            <small class="text-muted">Если ваша книга на бесплатной промоакции, просто напишите "0"</small>
+                                            <small class="text-muted">If your book is on free promotion, just write "0"</small>
                                         </div>
                                         <div class="mb-2">
-                                            <strong>Стоимость: 200 звезд</strong>
+                                            <strong>Cost: 200 stars</strong>
                                         </div>
                                     </div>
                                 {% elif radio.choice_value == 'verified_print' %}
@@ -105,7 +105,7 @@
                                          style="{% if form.reading_type.value != 'verified_print' %}display:none;{% endif %}">
                                         <div class="mb-2">
                                             <label for="{{ form.print_book_link.id_for_label }}" class="form-label">
-                                                Ссылка на печатную книгу *
+                                                Link to the printed book *
                                             </label>
                                             {{ form.print_book_link }}
                                             {% if form.print_book_link.errors %}
@@ -114,7 +114,7 @@
                                         </div>
                                         <div class="mb-2">
                                             <label for="{{ form.print_book_price.id_for_label }}" class="form-label">
-                                                Цена вашей печатной книги на Amazon, USD *
+                                                The price of your printed book on Amazon, USD *
                                             </label>
                                             {{ form.print_book_price }}
                                             {% if form.print_book_price.errors %}
@@ -122,30 +122,30 @@
                                             {% endif %}
                                         </div>
                                         <div class="mb-2">
-                                            <strong>Стоимость: 250 звезд</strong>
+                                            <strong>Cost: 250 stars</strong>
                                         </div>
                                         
                                         <!-- Photo/Video options -->
                                         <div class="form-check mt-2">
                                             {{ form.add_photo_review }}
                                             <label class="form-check-label" for="{{ form.add_photo_review.id_for_label }}">
-                                                Добавить фото в отзыв (+50 звезд)
+                                                Add photo to review (+50 stars)
                                             </label>
                                         </div>
                                         <div class="form-check">
                                             {{ form.add_video_review }}
                                             <label class="form-check-label" for="{{ form.add_video_review.id_for_label }}">
-                                                Добавить видео в отзыв (+100 звезд)
+                                                Add video to review (+100 stars)
                                             </label>
                                         </div>
                                     </div>
                                 {% elif radio.choice_value == 'standard' %}
                                     <div class="mt-2">
-                                        <strong>Стоимость: 100 звезд</strong>
+                                        <strong>Cost: 100 stars</strong>
                                     </div>
                                 {% elif radio.choice_value == 'kindle_unlimited' %}
                                     <div class="mt-2">
-                                        <strong>Стоимость: 150 звезд</strong>
+                                        <strong>Cost: 150 stars</strong>
                                     </div>
                                 {% endif %}
                             </label>
@@ -162,12 +162,12 @@
                 <div class="form-check mb-2">
                     {{ form.add_goodreads_review }}
                     <label class="form-check-label" for="{{ form.add_goodreads_review.id_for_label }}">
-                        Добавить отзыв на Goodreads (+50 звезд)
+                        Add a review on Goodreads (+50 stars)
                     </label>
                 </div>
                 <div id="goodreads_fields" style="{% if not form.add_goodreads_review.value %}display:none;{% endif %}">
                     <label for="{{ form.goodreads_link.id_for_label }}" class="form-label">
-                        Введите ссылку на вашу книгу на Goodreads
+                        Enter your book link on Goodreads
                     </label>
                     {{ form.goodreads_link }}
                     {% if form.goodreads_link.errors %}
@@ -181,18 +181,18 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h4>Итого к оплате: <span id="total_stars">{{ book.get_stars_cost }}</span> звезд</h4>
-                <p class="text-muted">Ваш текущий баланс: {{ user.star_balance.balance|default:0 }} звезд</p>
+                <p class="text-muted">Your current balance: {{ user.star_balance.balance|default:0 }} stars</p>
                 
                 {% if user.star_balance.balance|default:0 < book.get_stars_cost %}
                     <div class="alert alert-warning">
-                        Недостаточно звезд для запроса обзора. Требуется {{ book.get_stars_cost }} звезд.
+                        Not enough stars to request a review. Required {{ book.get_stars_cost }} stars.
                     </div>
-                    <button type="submit" class="btn btn-primary" disabled>Получить обзоры</button>
+                    <button type="submit" class="btn btn-primary" disabled>Get reviews</button>
                 {% else %}
-                    <button type="submit" class="btn btn-primary">Получить обзоры</button>
+                    <button type="submit" class="btn btn-primary">Get reviews</button>
                 {% endif %}
                 
-                <a href="{% url 'books:view_book' book.id %}" class="btn btn-secondary">Отмена</a>
+                <a href="{% url 'books:view_book' book.id %}" class="btn btn-secondary">Cancel</a>
             </div>
         </div>
     </form>

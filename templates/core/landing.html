@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5" id="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-4 fw-bold">Get unlimited book reviews</h1>
+                <p class="lead">Start generating reviews for your low content and non-fiction books on Amazon</p>
+                <div class="mb-3">
+                    <span class="badge bg-light text-dark me-2">7-day free trial</span>
+                    <span class="badge bg-light text-dark me-2">5 mins setup</span>
+                    <span class="badge bg-light text-dark">Risk free</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-warning">★★★★★</span>
+                    <span class="ms-2">100+ 5 stars (Trustpilot)</span>
+                </div>
+                <a href="{% url 'users:register' %}" class="btn btn-light btn-lg">Try for free</a>
+            </div>
+            <div class="col-md-4 text-center">
+                <!-- Здесь можно добавить изображение -->
+                <div class="bg-light rounded p-4 text-dark">
+                    <h3>Join 10,000+ Authors</h3>
+                    <p>Trusted by authors worldwide</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5" id="features">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Features</h2>
+            <p class="lead">Why you should try</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Infinite reviews</h5>
+                        <p class="card-text">Authors control review frequency and timing. The author dashboard shows when readers start reading and review your book.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Quick turnaround</h5>
+                        <p class="card-text">There is no queue. In most cases, our turnaround time is only three days.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">No review fees</h5>
+                        <p class="card-text">Pay one monthly cost, not per review. You can get unlimited reviews every month.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Cancel at any time</h5>
+                        <p class="card-text">Easy cancellation. No commitment for monthly membership. Cancel anytime.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Always-available support</h5>
+                        <p class="card-text">Any platform questions? One of our staff members will respond to your live chat or email support@bookstars.reviews within 24 hours.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Drive sales</h5>
+                        <p class="card-text">Customer reviews don't only increase the reputation of an author, but they drive sales and make their book more likely to be returned on Amazon's search engines.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Supported Genres -->
+<section class="bg-light py-5" id="genres">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Supported Genres</h2>
+            <p class="lead">Multi-genre support ready for your promotion</p>
+        </div>
+        
+        <div class="row justify-content-center mx-auto">
+            <div class="col-md-3">
+                <h4>Low content books</h4>
+                <ul>
+                    <li>Children's books</li>
+                    <li>Picture books</li>
+                    <li>Activity books</li>
+                    <li>Trivia books</li>
+                    <li>Cook books</li>
+                    <li>Workbooks etc</li>
+                </ul>
+            </div>
+            
+            <div class="col-md-3">
+                <h4>Non-fiction books</h4>
+                <ul>
+                    <li>Self-help books</li>
+                    <li>Business books</li>
+                    <li>How-to books</li>
+                    <li>Fitness books</li>
+                    <li>Language books etc.</li>
+                </ul>
+            </div>
+
+            <div class="text-center mt-5">
+                <p class="text-muted">However, if your book is in another genre, you can still add it, and our team members will either approve or deny it.</p>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5" id="how-it-works">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>How it works</h2>
+            <p class="lead">Fast onboarding experience</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                    1
+                </div>
+                <h4>Add your book</h4>
+                <p>Take a few minutes to add your book cover and info about your book</p>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                    2
+                </div>
+                <h4>Collect stars</h4>
+                <p>Support other authors by reading and reviewing their books to receive stars</p>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                    3
+                </div>
+                <h4>Get book reviews</h4>
+                <p>Use your stars to list your books in our community library to get reviewed</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="py-5" id="pricing">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Pricing</h2>
+            <p class="lead">Choose the plan that's right for you</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for plan in plans %}
+            <div class="col-md-6">
+                <div class="card h-100 {% if plan.is_popular %}border-primary border-2{% endif %}">
+                    {% if plan.is_popular %}
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Most Popular</span>
+                            {% if plan.save_text %}
+                            <span class="badge bg-light text-dark">{{ plan.save_text }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h3 class="card-title">{{ plan.name }}</h3>
+                        <div class="mb-3">
+                            <span class="display-4">{{ plan.price }}</span>
+                            <span class="text-muted">/{{ plan.period }}</span>
+                            {% if plan.original_price %}
+                            <div class="text-muted"><s>{{ plan.original_price }}</s></div>
+                            {% endif %}
+                        </div>
+                        
+                        <ul class="list-unstyled">
+                            {% for feature in plan.features %}
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                {{ feature }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <a href="{% url 'users:register' %}" class="btn {% if plan.is_popular %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">
+                            Try for free
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <p class="text-muted">All plans include a 7-day free trial. No credit card required.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>What our clients say about us</h2>
+            <p class="lead">The most honest reviews for our customers</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">"My experience has been fantastic, and I feel that BOOKSTARS has provided us authors with a refreshing opportunity to share our work with the world."</p>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h6 class="mb-0">Andrew</h6>
+                                <small class="text-muted">Self-pub author</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">"My experience has been fantastic, and I feel that BOOKSTARS has provided us authors with a refreshing opportunity to share our work with the world."</p>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h6 class="mb-0">Stan</h6>
+                                <small class="text-muted">Self-pub author</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">"My experience has been fantastic, and I feel that BOOKSTARS has provided us authors with a refreshing opportunity to share our work with the world."</p>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h6 class="mb-0">Alex</h6>
+                                <small class="text-muted">Self-pub author</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container text-center">
+        <h2>Ready to get started?</h2>
+        <p class="lead">Join thousands of authors who are already getting unlimited reviews</p>
+        <a href="{% url 'users:register' %}" class="btn btn-primary btn-lg">Try for free - 7 day trial</a>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5" id="faq">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Frequently Asked Questions</h2>
+        </div>
+        
+        <div class="accordion" id="faqAccordion">
+            {% for faq in faqs %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">
+                        {{ faq.question }}
+                    </button>
+                </h2>
+                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        {{ faq.answer }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

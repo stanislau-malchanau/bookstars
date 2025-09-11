@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>{{ book.title }}</h2>
-<p><strong>Автор:</strong> {{ book.author }}</p>
-<p><strong>ASIN:</strong> {{ book.asin|default:"Не указан" }}</p>
-<p><strong>Язык:</strong> {{ book.language }}</p>
-<p><strong>Жанр:</strong> {{ book.genre }}</p>
-<p><strong>Статус:</strong> {{ book.get_status_display }}</p>
-<p><strong>Дата создания:</strong> {{ book.created_at }}</p>
+<div class="container">
+    <h2>{{ book.title }}</h2>
+    <p><strong>Author:</strong> {{ book.author }}</p>
+    <p><strong>ASIN:</strong> {{ book.asin|default:"Не указан" }}</p>
+    <p><strong>Language:</strong> {{ book.language }}</p>
+    <p><strong>Genre:</strong> {{ book.genre }}</p>
+    <p><strong>Status:</strong> {{ book.get_status_display }}</p>
+    <p><strong>Date created:</strong> {{ book.created_at }}</p>
 
-<a href="{% url 'books:my_books' %}" class="btn btn-secondary">Назад к списку</a>
-{% if book.status == 'draft' or book.status == 'rejected' %}
-    <a href="{% url 'books:edit_book' book.pk %}" class="btn btn-primary">Редактировать</a>
-{% endif %}
+    <a href="{% url 'books:my_books' %}" class="btn btn-secondary">Back</a>
+    {% if book.status == 'draft' or book.status == 'rejected' %}
+        <a href="{% url 'books:edit_book' book.pk %}" class="btn btn-primary">Edit</a>
+    {% endif %}
+</div>
 {% endblock %}
